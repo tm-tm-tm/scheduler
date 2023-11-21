@@ -1,95 +1,111 @@
-import Image from 'next/image'
+'use client'
+
+import OpenAI from 'openai';
+import { OpenAIStream } from 'ai';
+import { useState, Suspense } from 'react'
 import styles from './page.module.css'
 
 export default function Home() {
+  const [loading, setLoading] = useState(false)
+  const [updatedPrompt, setUpdatedPrompt] = useState('')
+  const [selectedYear, setSelectedYear] = useState(2023)
+  const [yearlyFrequency, setYearlyFrequency] = useState(1)
+  const [monthlyFrequency, setMonthlyFrequency] = useState(0)
+  const [includePublicHolidays, setIncludePublicHolidays] = useState(false)
+  const [generatedSchedule, setGeneratedSchedule] = useState('')
+
+  const prompt = `Generate a schedule of events. These events will be within the year ${selectedYear} and occur ${yearlyFrequency} times yearly, spaced evenly throughout the year.`
+
+  const handleYearChange = (event) => {
+    setSelectedYear(event.target.value)
+  }
+
+  const handleNumberChange = (event) => {
+    const newNumber = Math.max(1, Math.min(20, event.target.value));
+    setYearlyFrequency(newNumber);
+  }
+
+  const generateSchedule = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/chat/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch: ${response.statusText}`);
+      }
+
+      const data = await response.text();
+
+      setGeneratedSchedule(data);
+    } catch (error) {
+      console.error("Error fetching schedule:", error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.js</code>
-        </p>
+      <h1>
+        Scheduler
+      </h1>
+
+      <form onSubmit={generateSchedule}>
         <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
+          <p>What year will these events take place</p>
+          <label>
+            Select a Year:
+            <input
+              type="number"
+              value={selectedYear}
+              onChange={handleYearChange}
+              placeholder="Enter a year"
+              min="2023"
+              max="2030"
             />
-          </a>
+          </label>
         </div>
-      </div>
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+        <div>
+          <p>How many events do you want per year?</p>
+          <label>
+            Select Frequency:
+            <input
+              type="number"
+              value={yearlyFrequency}
+              onChange={handleNumberChange}
+              placeholder="Enter a frequency per year"
+              min="1"
+              max="20"
+            />
+          </label>
+        </div>
 
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
+        <br />
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
+        <button type="submit">
+          Submit
+        </button>
+      </form>
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
+      {generatedSchedule && (
+        <div>
           <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
+            {generatedSchedule}
           </p>
-        </a>
-      </div>
+        </div>
+      )}
+
     </main>
   )
 }
