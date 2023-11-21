@@ -62,7 +62,7 @@ export default function Home() {
 
       <form onSubmit={generateSchedule}>
         <div>
-          <p>What year will these events take place</p>
+          <p>What year will these events take place?</p>
           <label>
             Select a Year:
             <input
