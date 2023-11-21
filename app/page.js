@@ -1,17 +1,13 @@
 'use client'
 
-import OpenAI from 'openai';
-import { OpenAIStream } from 'ai';
-import { useState, Suspense } from 'react'
+import { useState } from 'react'
 import styles from './page.module.css'
 
 export default function Home() {
   const [loading, setLoading] = useState(false)
   const [selectedYear, setSelectedYear] = useState(2023)
   const [yearlyFrequency, setYearlyFrequency] = useState(1)
-  const [monthlyFrequency, setMonthlyFrequency] = useState(0)
   const [preferredDay, setPreferredDay] = useState('')
-  const [includePublicHolidays, setIncludePublicHolidays] = useState(false)
   const [generatedSchedule, setGeneratedSchedule] = useState('')
 
   const prompt = `Generate a schedule of events within the calendar year ${selectedYear} (between January 1 - December 30 ${selectedYear}). These events will occur ${yearlyFrequency} times yearly, spaced as evenly as possible throughout the year. Please ensure all dates selected are on ${preferredDay} dates. Please ensure to cross check with the ${selectedYear} calendar to ensure accurate dates within the selected year.`
@@ -32,7 +28,6 @@ export default function Home() {
   const generateSchedule = async (e) => {
     e.preventDefault();
     setLoading(true);
-    console.log(prompt)
 
     try {
       const response = await fetch("/api/chat/", {
@@ -58,6 +53,7 @@ export default function Home() {
       setLoading(false);
     }
   };
+  
 
   return (
     <main className={styles.main}>
@@ -98,7 +94,6 @@ export default function Home() {
 
         <div>
           <p>What day of the week?</p>
-
           <label>
             Select a Day:
             <select value={preferredDay} onChange={handleDayChange}>
@@ -130,7 +125,6 @@ export default function Home() {
             </p>
           </div>
       }
-
 
     </main >
   )
