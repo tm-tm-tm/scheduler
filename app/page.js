@@ -14,7 +14,7 @@ export default function Home() {
   const [includePublicHolidays, setIncludePublicHolidays] = useState(false)
   const [generatedSchedule, setGeneratedSchedule] = useState('')
 
-  const prompt = `Generate a schedule of events within the calendar year ${selectedYear} (between January 1 - December 30 ${selectedYear}) and occur ${yearlyFrequency} times yearly, spaced evenly throughout the year. Please ensure all dates selected are on ${preferredDay} dates. Please ensure you return dates that are legitimate dates, and cross check with the ${selectedYear} calendar to ensure dates are within the selected year.`
+  const prompt = `Generate a schedule of events within the calendar year ${selectedYear} (between January 1 - December 30 ${selectedYear}). These events will occur ${yearlyFrequency} times yearly, spaced as evenly as possible throughout the year. Please ensure all dates selected are on ${preferredDay} dates. Please ensure to cross check with the ${selectedYear} calendar to ensure accurate dates within the selected year.`
 
   const handleYearChange = (event) => {
     setSelectedYear(event.target.value)
@@ -32,6 +32,7 @@ export default function Home() {
   const generateSchedule = async (e) => {
     e.preventDefault();
     setLoading(true);
+    console.log(prompt)
 
     try {
       const response = await fetch("/api/chat/", {
@@ -81,7 +82,7 @@ export default function Home() {
         </div>
 
         <div>
-          <p>How many events do you want per year?</p>
+          <p>How many events per year?</p>
           <label>
             Select Frequency:
             <input
@@ -96,7 +97,7 @@ export default function Home() {
         </div>
 
         <div>
-          <p>What day of the week will these events occur?</p>
+          <p>What day of the week?</p>
 
           <label>
             Select a Day:
