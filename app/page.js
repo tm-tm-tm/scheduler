@@ -7,20 +7,24 @@ import styles from './page.module.css'
 
 export default function Home() {
   const [loading, setLoading] = useState(false)
-  const [updatedPrompt, setUpdatedPrompt] = useState('')
   const [selectedYear, setSelectedYear] = useState(2023)
   const [yearlyFrequency, setYearlyFrequency] = useState(1)
   const [monthlyFrequency, setMonthlyFrequency] = useState(0)
+  const [preferredDay, setPreferredDay] = useState('')
   const [includePublicHolidays, setIncludePublicHolidays] = useState(false)
   const [generatedSchedule, setGeneratedSchedule] = useState('')
 
-  const prompt = `Generate a schedule of events. These events will be within the year ${selectedYear} and occur ${yearlyFrequency} times yearly, spaced evenly throughout the year.`
+  const prompt = `Generate a schedule of events within the calendar year ${selectedYear} (between January 1 - December 30 ${selectedYear}) and occur ${yearlyFrequency} times yearly, spaced evenly throughout the year. Please ensure all dates selected are on ${preferredDay} dates. Please ensure you return dates that are legitimate dates, and cross check with the ${selectedYear} calendar to ensure dates are within the selected year.`
 
   const handleYearChange = (event) => {
     setSelectedYear(event.target.value)
   }
 
-  const handleNumberChange = (event) => {
+  const handleDayChange = (event) => {
+    setPreferredDay(event.target.value);
+  }
+
+  const handleEventNumberChange = (event) => {
     const newNumber = Math.max(1, Math.min(20, event.target.value));
     setYearlyFrequency(newNumber);
   }
@@ -83,11 +87,29 @@ export default function Home() {
             <input
               type="number"
               value={yearlyFrequency}
-              onChange={handleNumberChange}
+              onChange={handleEventNumberChange}
               placeholder="Enter a frequency per year"
               min="1"
               max="20"
             />
+          </label>
+        </div>
+
+        <div>
+          <p>What day of the week will these events occur?</p>
+
+          <label>
+            Select a Day:
+            <select value={preferredDay} onChange={handleDayChange}>
+              <option value="">Select a day</option>
+              <option value="Monday">Monday</option>
+              <option value="Tuesday">Tuesday</option>
+              <option value="Wednesday">Wednesday</option>
+              <option value="Thursday">Thursday</option>
+              <option value="Friday">Friday</option>
+              <option value="Saturday">Saturday</option>
+              <option value="Sunday">Sunday</option>
+            </select>
           </label>
         </div>
 
@@ -98,14 +120,17 @@ export default function Home() {
         </button>
       </form>
 
-      {generatedSchedule && (
-        <div>
-          <p>
-            {generatedSchedule}
-          </p>
-        </div>
-      )}
+      {
+        loading ?
+          <p> loading... </p> :
+          <div>
+            <p>
+              {generatedSchedule}
+            </p>
+          </div>
+      }
 
-    </main>
+
+    </main >
   )
 }
