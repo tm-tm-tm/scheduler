@@ -1,4 +1,36 @@
 .main {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  width: 50%;
+}
+
+.heading {
+  margin: 24px;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.formElement {
+  margin: 0 24px;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.formSection {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5em 0;
+}
+
+.button {
+  width: 120px;
+  padding: 0.5em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.responseElement {
+  margin: 24px;
 }

@@ -10,7 +10,7 @@ export default function Home() {
   const [preferredDay, setPreferredDay] = useState('')
   const [generatedSchedule, setGeneratedSchedule] = useState('')
 
-  const prompt = `Generate a schedule of events within the calendar year ${selectedYear} (between January 1 - December 30 ${selectedYear}). These events will occur ${yearlyFrequency} times yearly, spaced as evenly as possible throughout the year. Please ensure all dates selected are on ${preferredDay} dates. Please ensure to cross check with the ${selectedYear} calendar to ensure accurate dates within the selected year.`
+  const prompt = `Generate a schedule of events within the calendar year ${selectedYear} (between January 1 - December 30 ${selectedYear}). These events will occur ${yearlyFrequency} times yearly, spaced as evenly as possible throughout the year. Please ensure all dates selected are on ${preferredDay} dates. Please ensure to cross check with the ${selectedYear} calendar to ensure accurate dates within the selected year. Do not suggest any dates within the following year, adjust the distances between dates to ensure they all fall within a single calendar year.`
 
   const handleYearChange = (event) => {
     setSelectedYear(event.target.value)
@@ -26,8 +26,8 @@ export default function Home() {
   }
 
   const generateSchedule = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+    e.preventDefault()
+    setLoading(true)
 
     try {
       const response = await fetch("/api/chat/", {
@@ -38,34 +38,35 @@ export default function Home() {
         body: JSON.stringify({
           prompt
         }),
-      });
+      })
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch: ${response.statusText}`);
+        throw new Error(`Failed to fetch: ${response.statusText}`)
       }
 
-      const data = await response.text();
+      const data = await response.text()
 
-      setGeneratedSchedule(data);
+      setGeneratedSchedule(data)
     } catch (error) {
-      console.error("Error fetching schedule:", error.message);
+      console.error("Error fetching schedule:", error.message)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
-  
+  }
 
   return (
     <main className={styles.main}>
-      <h1>
+      <h1 className={styles.heading}>
         Scheduler
       </h1>
 
-      <form onSubmit={generateSchedule}>
-        <div>
+      <form
+        onSubmit={generateSchedule}
+        className={styles.formElement}
+      >
+        <div className={styles.formSection}>
           <p>What year will these events take place?</p>
           <label>
-            Select a Year:
             <input
               type="number"
               value={selectedYear}
@@ -77,10 +78,9 @@ export default function Home() {
           </label>
         </div>
 
-        <div>
+        <div className={styles.formSection}>
           <p>How many events per year?</p>
           <label>
-            Select Frequency:
             <input
               type="number"
               value={yearlyFrequency}
@@ -92,10 +92,9 @@ export default function Home() {
           </label>
         </div>
 
-        <div>
-          <p>What day of the week?</p>
+        <div className={styles.formSection}>
+          <p>What are your preferred day(s) of the week?</p>
           <label>
-            Select a Day:
             <select value={preferredDay} onChange={handleDayChange}>
               <option value="">Select a day</option>
               <option value="Monday">Monday</option>
@@ -105,27 +104,43 @@ export default function Home() {
               <option value="Friday">Friday</option>
               <option value="Saturday">Saturday</option>
               <option value="Sunday">Sunday</option>
+              <option value="Weekend Only">Weekend Only</option>
+              <option value="Weekday Only">Weekday Only</option>
             </select>
           </label>
         </div>
 
-        <br />
-
-        <button type="submit">
+        <button
+          type="submit"
+          className={styles.button}
+        >
           Submit
         </button>
       </form>
 
-      {
-        loading ?
-          <p> loading... </p> :
-          <div>
-            <p>
-              {generatedSchedule}
-            </p>
-          </div>
-      }
+      <div className={styles.responseElement}>
+        {
+          loading ?
+            <p> loading... </p>
+            :
+            <div>
+              <p>
+                {/* {generatedSchedule} */}
+                {generatedSchedule.split('\n').map((date, index) => (
+                  <span key={index}>
+                    {date}
+                    <br />
+                  </span>
+                ))}
+              </p>
+            </div>
+        }
+      </div>
+
+
 
     </main >
   )
 }
+
+
